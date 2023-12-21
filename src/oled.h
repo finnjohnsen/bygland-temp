@@ -13,26 +13,34 @@ namespace OLED {
     void setup() {
         u8g2.begin();
         u8g2.enableUTF8Print();
-        u8g2.setFont(u8g2_font_ncenB14_tr);
-        u8g2.setFont(u8g2_font_ncenB14_tr);
+        u8g2.setFont(u8g2_font_helvR12_tf);
         u8g2.setFontDirection(0);
         u8g2.clearBuffer();
-        u8g2.setCursor(0, 15);
-        u8g2.print("Starter...");
+        u8g2.drawStr(0, 15, "Starter...");
         u8g2.sendBuffer();
 
     }
 
-    void updateScreen(TempAndHumidity tempAndHumidity) {
-        String temperatureString = "" + String(tempAndHumidity.temperature, 1) + "1 °C";
-        String humidityString = "" + String(tempAndHumidity.humidity, 1) + " %";
-        u8g2.setFont(u8g2_font_ncenB14_tr);
+    void updateScreen(TempAndHumidity tempAndHumidity, bool deviceIsConnected) {
+        String temperatureString = "" + String(tempAndHumidity.temperature, 1) + "°C";
+        String humidityString = "" + String(tempAndHumidity.humidity, 1) + "%";
+        u8g2.setFont(u8g2_font_helvR12_tf);
+        //u8g2.setFont(u8g2_font_helvR12_tf);
+        
         u8g2.setFontDirection(0);
         u8g2.clearBuffer();
-        u8g2.setCursor(0, 15);
+        u8g2.setCursor(0, 12);
         u8g2.print(temperatureString);
-        u8g2.setCursor(65, 32);
-        u8g2.print(humidityString);
+        u8g2.drawStr(75, 32, humidityString.c_str());
+
+        u8g2.setFont(u8g2_font_open_iconic_embedded_2x_t);
+        u8g2.setFontDirection(0);
+        if (deviceIsConnected == true) {
+            u8g2.drawUTF8(55, 24, String("\u004a").c_str());
+        } else {
+            //u8g2.drawStr(85, 15, "[ ]");
+            u8g2.drawUTF8(55, 24, String("\u0047").c_str());
+        }
         u8g2.sendBuffer();
     }
 }

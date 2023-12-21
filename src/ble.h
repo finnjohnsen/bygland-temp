@@ -23,6 +23,10 @@ NimBLEUUID humidityCharacteristicUUID = NimBLEUUID((uint16_t)0x2A6F);
 
 namespace BLE {
 
+    bool isDeviceConnected() {
+        return deviceConnected;
+    }
+
     class MyServerCallbacks: public NimBLEServerCallbacks {
         void onConnect(NimBLEServer* pServer) {
             Serial.println("Connect");

@@ -11,6 +11,7 @@ const auto BLE_NOTIFY_INTERVAL_MS = 6010;
 Timer<> timer; // save as above
 
 TempReadResult lastRead;
+bool bleDeviceIsConnected = false;
 
 bool ble_notify(void *) {
   if (lastRead.ok == true) {
@@ -22,7 +23,7 @@ bool ble_notify(void *) {
 bool temperature_read(void *) {
   lastRead = TempSensor::readTemperatureAndHumidity();
   if (lastRead.ok == true) {
-    OLED::updateScreen(lastRead.tempAndHumidity);
+    OLED::updateScreen(lastRead.tempAndHumidity, bleDeviceIsConnected);
   }
   return true;
 }
@@ -36,6 +37,7 @@ bool startup(void *) {
 
 bool ble_update_connections(void *) {
   BLE::updateConnections();
+  bleDeviceIsConnected = BLE::isDeviceConnected();
   return true;
 }
 
