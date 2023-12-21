@@ -3,12 +3,12 @@
 #include <Wire.h>
 
 namespace OLED {
-    // U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C
 
-    U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C u8g2(U8G2_R0, 
-        /* clock=*/ GPIO_NUM_26, 
-        /* data=*/  GPIO_NUM_25, 
-        /* reset=*/ U8X8_PIN_NONE);   // All Boards without Reset of the Display
+    U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C u8g2(
+        U8G2_R0, 
+        GPIO_NUM_26, 
+        GPIO_NUM_25, 
+        U8X8_PIN_NONE);
 
     void setup() {
         u8g2.begin();
@@ -23,7 +23,7 @@ namespace OLED {
 
     }
 
-    void loop(TempAndHumidity tempAndHumidity) {
+    void updateScreen(TempAndHumidity tempAndHumidity) {
         String temperatureString = "" + String(tempAndHumidity.temperature, 1) + "1 °C";
         String humidityString = "" + String(tempAndHumidity.humidity, 1) + " %";
         u8g2.setFont(u8g2_font_ncenB14_tr);
@@ -33,12 +33,8 @@ namespace OLED {
         u8g2.print(temperatureString);
         u8g2.setCursor(65, 32);
         u8g2.print(humidityString);
-        // u8g2.setCursor(0, 40);
-        // u8g2.print("你好世界");		// Chinese "Hello World" 
         u8g2.sendBuffer();
-
     }
-
 }
 
 //U8G2_NULL u8g2(U8G2_R0);	// null device, a 8x8 pixel display which does nothing

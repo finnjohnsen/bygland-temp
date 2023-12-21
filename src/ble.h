@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 
+const String deviceName = "esp-temperature-1";
 
 NimBLECharacteristic* pTempCharacteristic = nullptr;
 NimBLECharacteristic* pHumCharacteristic = nullptr;
@@ -49,7 +50,7 @@ namespace BLE {
     }
 
     void setup() {
-        NimBLEDevice::init("ESP32");
+        NimBLEDevice::init(deviceName.c_str());
         // NimBLEDevice::setSecurityAuth(true, true, true);
         // NimBLEDevice::setSecurityPasskey();
         // NimBLEDevice::setSecurityIOCap(BLE_HS_IO_DISPLAY_ONLY);
@@ -78,17 +79,16 @@ namespace BLE {
         Serial.println("Waiting a client connection to notify...");
     }
 
-    void loop(TempAndHumidity tempAndHumidity) {
-        // notify changed value
+    void notify(TempAndHumidity tempAndHumidity) {
         if (deviceConnected) {
             pTempCharacteristic->setValue(String(tempAndHumidity.temperature*100, 1).toInt());
             pTempCharacteristic->notify();
-
             pHumCharacteristic->setValue(String(tempAndHumidity.humidity*100, 1).toInt());
             pHumCharacteristic->notify();
-
         }
+    }
 
+    void updateConnections() {
         // disconnecting
         if (!deviceConnected && oldDeviceConnected) {
             NimBLEAdvertising *pAdvertising = NimBLEDevice::getAdvertising();
@@ -106,6 +106,5 @@ namespace BLE {
             // do stuff here on connecting
             oldDeviceConnected = deviceConnected;
         }
-
     }
 }
