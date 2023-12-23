@@ -4,13 +4,16 @@
 
 namespace OLED {
 
-    U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C u8g2(
+    bool started = false;
+    U8G2 u8g2;
+
+    void setup(int sda, int scl) {
+
+        u8g2 = U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C(
         U8G2_R0, 
-        GPIO_NUM_26, 
-        GPIO_NUM_25, 
+        sda, scl, 
         U8X8_PIN_NONE);
 
-    void setup() {
         u8g2.begin();
         u8g2.enableUTF8Print();
         u8g2.setFont(u8g2_font_helvR12_tf);
@@ -18,10 +21,12 @@ namespace OLED {
         u8g2.clearBuffer();
         u8g2.drawStr(0, 15, "Starter...");
         u8g2.sendBuffer();
+        started = true;
 
     }
 
     void updateScreen(TempAndHumidity tempAndHumidity, bool deviceIsConnected) {
+        if (!started) return;
         String temperatureString = "" + String(tempAndHumidity.temperature, 1) + "°C";
         String humidityString = "" + String(tempAndHumidity.humidity, 1) + "%";
         u8g2.setFont(u8g2_font_helvR12_tf);
@@ -43,6 +48,15 @@ namespace OLED {
         }
         u8g2.sendBuffer();
     }
+
+    void updateScreen(String message) {
+        if (!started) return;
+        u8g2.setFont(u8g2_font_helvR12_tf);
+        u8g2.setFontDirection(0);
+        u8g2.clearBuffer();
+        u8g2.drawStr(0, 15, message.c_str());
+        u8g2.sendBuffer();
+   }
 }
 
 //U8G2_NULL u8g2(U8G2_R0);	// null device, a 8x8 pixel display which does nothing

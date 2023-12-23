@@ -4,12 +4,30 @@
 #include "ble.h"
 #include "oled.h"
 
+#ifndef DEVICE_NAME
+#pragma message(DEVICE_NAME MUST BE SET)
+#error Set -D DEVICE_NAME=xx pin in build_flag in platform.io
+#endif
+
+#ifndef TEMP_GPIO
+#pragma message(TEMP_GPIO MUST BE SET)
+#error Set -D TEMP_GPIO=xx pin in build_flag in platform.io
+#endif
+
+#ifndef OLED_SDA
+#pragma message(OLED_SDA MUST BE SET)
+#error Set -D OLD_SDA=xx pin build_flag in platform.io
+#endif
+
+#ifndef OLED_SLC
+#pragma message(OLED_SLC MUST BE SET)
+#error Set -D OLD_SLC=xx pin build_flag in platform.io
+#endif
+
+
 const auto READ_TEMPERATURE_INTERVAL_MS = 3000;
 const auto BLE_NOTIFY_INTERVAL_MS = 6010;
-
-
-Timer<> timer; // save as above
-
+Timer<> timer;
 TempReadResult lastRead;
 bool bleDeviceIsConnected = false;
 
@@ -21,10 +39,14 @@ bool ble_notify(void *) {
 }
 
 bool temperature_read(void *) {
-  lastRead = TempSensor::readTemperatureAndHumidity();
-  if (lastRead.ok == true) {
-    OLED::updateScreen(lastRead.tempAndHumidity, bleDeviceIsConnected);
-  }
+    lastRead = TempSensor::readTemperatureAndHumidity();
+    if (lastRead.ok == true) {
+      OLED::updateScreen(lastRead.tempAndHumidity, bleDeviceIsConnected);
+    } else {
+      OLED::updateScreen("Sensorfeil 😭");
+    }
+
+
   return true;
 }
 
@@ -43,9 +65,9 @@ bool ble_update_connections(void *) {
 
 void setup() {
   Serial.begin(115200);
-  OLED::setup();
-  BLE::setup();
-  TempSensor::setup(GPIO_NUM_32);
+  OLED::setup(OLED_SDA, OLED_SLC);
+  BLE::setup(DEVICE_NAME);
+  TempSensor::setup(TEMP_GPIO);
   timer.in(2100, startup);
   timer.every(500, ble_update_connections);
 }

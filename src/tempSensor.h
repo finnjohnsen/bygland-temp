@@ -17,6 +17,7 @@ namespace TempSensor {
 
     void setup(int pin) {
         dht.setup(pin, DHTesp::DHT22);
+        Serial.print(String("Temp sensor started\n"));
     }
 
     TempReadResult readTemperatureAndHumidity() {
@@ -31,7 +32,9 @@ namespace TempSensor {
             Serial.print(" %hum\t");
             Serial.print(tempHumid.temperature, 1);
             Serial.print(" °C \n");
-        } 
+        } else {
+            Serial.println(String("Failed to read temp sensor ") + String(dht.getStatusString()));
+        }
         return result;
     }
 }

@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 
-const String deviceName = "esp-temperature-1";
-
 NimBLECharacteristic* pTempCharacteristic = nullptr;
 NimBLECharacteristic* pHumCharacteristic = nullptr;
 
@@ -53,7 +51,7 @@ namespace BLE {
         pAdvertising->start();
     }
 
-    void setup() {
+    void setup(String deviceName) {
         NimBLEDevice::init(deviceName.c_str());
         // NimBLEDevice::setSecurityAuth(true, true, true);
         // NimBLEDevice::setSecurityPasskey();
