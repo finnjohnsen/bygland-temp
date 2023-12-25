@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <esp_wifi.h>
 #include <arduino-timer.h>
 #include "tempSensor.h"
 #include "ble.h"
@@ -45,13 +46,24 @@ bool ble_update_connections(void *) {
   return true;
 }
 
+bool sleep (void *) {
+  esp_sleep_enable_timer_wakeup(1000000LL * 30);
+  Serial.printf("Sleep");
+  esp_deep_sleep_start();
+  return true;
+}
+
 void setup() {
+  esp_wifi_stop();
   Serial.begin(115200);
+  Serial.printf("Startup");
+  
   OLED::setup();
   BLE::setup(DEVICE_NAME);
   TempSensor::setup();
   timer.in(2100, startup);
   timer.every(500, ble_update_connections);
+  //timer.in(30000, sleep);
 }
 
 void loop() {

@@ -21,17 +21,23 @@ namespace OLED {
     void setup() {
 
         //flip screen: U8G2_R0, U8G2_R1, R3 etc
-        u8g2 = U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C( U8G2_R2, 
-        OLED_SCL, OLED_SDA, U8X8_PIN_NONE);
+        if (started == false) {
+            u8g2 = U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C( 
+                U8G2_R2, 
+                OLED_SCL, 
+                OLED_SDA, 
+                U8X8_PIN_NONE);
 
-        u8g2.begin();
-        u8g2.enableUTF8Print();
-        u8g2.setFont(u8g2_font_helvR12_tf);
-        u8g2.setFontDirection(0);
-        u8g2.clearBuffer();
-        u8g2.drawStr(0, 15, "Starter...");
-        u8g2.sendBuffer();
-        started = true;
+            u8g2.begin();
+            u8g2.enableUTF8Print();
+            u8g2.setFont(u8g2_font_helvR12_tf);
+            u8g2.setFontDirection(0);
+            u8g2.clearBuffer();
+            u8g2.drawStr(0, 15, "Starter...");
+            u8g2.sendBuffer();
+            started = true;
+        }
+
 
     }
 
