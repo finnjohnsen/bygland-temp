@@ -7,6 +7,11 @@
 #error Select ESP32 board.
 #endif
 
+#ifndef TEMP_GPIO
+#pragma message(TEMP_GPIO MUST BE SET)
+#error Set -D TEMP_GPIO=xx pin in build_flag in platform.io
+#endif
+
 struct TempReadResult {
     bool ok = false;
     TempAndHumidity tempAndHumidity;
@@ -15,8 +20,8 @@ struct TempReadResult {
 namespace TempSensor {
     DHTesp dht;
 
-    void setup(int pin) {
-        dht.setup(pin, DHTesp::DHT22);
+    void setup() {
+        dht.setup(TEMP_GPIO, DHTesp::DHT22);
         Serial.print(String("Temp sensor started\n"));
     }
 

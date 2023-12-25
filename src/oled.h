@@ -2,17 +2,27 @@
 #include <U8g2lib.h>
 #include <Wire.h>
 
+
+#ifndef OLED_SDA
+#pragma message(OLED_SDA MUST BE SET)
+#error Set -D OLD_SDA=xx pin build_flag in platform.io
+#endif
+
+#ifndef OLED_SCL
+#pragma message(OLED_SCL MUST BE SET)
+#error Set -D OLD_SCL=xx pin build_flag in platform.io
+#endif
+
 namespace OLED {
 
     bool started = false;
     U8G2 u8g2;
 
-    void setup(int sda, int scl) {
+    void setup() {
 
-        u8g2 = U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C(
-        U8G2_R0, 
-        sda, scl, 
-        U8X8_PIN_NONE);
+        //flip screen: U8G2_R0, U8G2_R1, R3 etc
+        u8g2 = U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C( U8G2_R2, 
+        OLED_SCL, OLED_SDA, U8X8_PIN_NONE);
 
         u8g2.begin();
         u8g2.enableUTF8Print();
