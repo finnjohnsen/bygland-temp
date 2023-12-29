@@ -18,6 +18,11 @@ NimBLEUUID environmentService = NimBLEUUID((uint16_t)0x181A);
 NimBLEUUID temperatureCharacteristicUUID = NimBLEUUID((uint16_t)0x2A6E);
 NimBLEUUID humidityCharacteristicUUID = NimBLEUUID((uint16_t)0x2A6F);
 
+#ifndef DEVICE_NAME
+#pragma message(DEVICE_NAME MUST BE SET)
+#error Set -D DEVICE_NAME=xx pin in build_flag in platform.io
+#endif
+
 
 namespace BLE {
 
@@ -36,8 +41,8 @@ namespace BLE {
         // Peer disconnected, add them to the whitelist
         // This allows us to use the whitelist to filter connection attempts
         // which will minimize reconnection time.
-        NimBLEDevice::whiteListAdd(NimBLEAddress(desc->peer_ota_addr));
-        deviceConnected = false;
+            NimBLEDevice::whiteListAdd(NimBLEAddress(desc->peer_ota_addr));
+            deviceConnected = false;
         }
     };
 
@@ -51,8 +56,8 @@ namespace BLE {
         pAdvertising->start();
     }
 
-    void setup(String deviceName) {
-        NimBLEDevice::init(deviceName.c_str());
+    void setup() {
+        NimBLEDevice::init(String(DEVICE_NAME).c_str());
         // NimBLEDevice::setSecurityAuth(true, true, true);
         // NimBLEDevice::setSecurityPasskey();
         // NimBLEDevice::setSecurityIOCap(BLE_HS_IO_DISPLAY_ONLY);
