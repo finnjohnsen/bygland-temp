@@ -2,49 +2,30 @@
 #include <U8g2lib.h>
 #include <Wire.h>
 
-
-#ifndef OLED_SDA
-#pragma message(OLED_SDA MUST BE SET)
-#error Set -D OLD_SDA=xx pin build_flag in platform.io
-#endif
-
-#ifndef OLED_SCL
-#pragma message(OLED_SCL MUST BE SET)
-#error Set -D OLD_SCL=xx pin build_flag in platform.io
-#endif
-
-typedef enum { 
-    BLE_NOT_CONNECTED,
-    BLE_CONNECTED,
-    SLEEPING
-} center_icon_type;
-
 namespace OLED {
+
+    bool started = false;
     U8G2 u8g2;
-    void updateCenterIcon(center_icon_type icon);
-    void setup(esp_sleep_source_t cause) {
 
+    void setup() {
         //flip screen: U8G2_R0, U8G2_R1, R3 etc
-        u8g2 = U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C( 
-            U8G2_R2, 
-            OLED_SCL, 
-            OLED_SDA, 
-            U8X8_PIN_NONE);
-        u8g2.begin();
-        u8g2.enableUTF8Print();
-        u8g2.setFont(u8g2_font_helvR12_tf);
-        u8g2.setFontDirection(0);
-
-        if (cause == 0) {
+        if (started == false) {
+            u8g2 = U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C(U8G2_R2, U8X8_PIN_NONE);
+            u8g2.begin();
+            u8g2.enableUTF8Print();
+            u8g2.setFont(u8g2_font_helvR12_tf);
+            u8g2.setFontDirection(0);
             u8g2.clearBuffer();
             u8g2.drawStr(0, 15, "Starter...");
             u8g2.sendBuffer();
+            started = true;
         }
     }
 
-    void updateScreen(TempAndHumidity tempAndHumidity, bool deviceIsConnected) {
-        String temperatureString = "" + String(tempAndHumidity.temperature, 1) + "°C";
-        String humidityString = "" + String(tempAndHumidity.humidity, 1) + "%";
+    void updateScreen(SHT31D tempAndHumidity, bool deviceIsConnected) {
+        if (!started) return;
+        String temperatureString = "" + String(tempAndHumidity.t, 1) + "°C";
+        String humidityString = "" + String(tempAndHumidity.rh, 1) + "%";
         u8g2.setFont(u8g2_font_helvR12_tf);
         //u8g2.setFont(u8g2_font_helvR12_tf);
         
@@ -57,29 +38,16 @@ namespace OLED {
         u8g2.setFont(u8g2_font_open_iconic_embedded_2x_t);
         u8g2.setFontDirection(0);
         if (deviceIsConnected == true) {
-            updateCenterIcon(BLE_CONNECTED);
-        } else {
-            updateCenterIcon(BLE_NOT_CONNECTED);
-
-        }
-        //u8g2.sendBuffer();
-    }
-
-    void updateCenterIcon(center_icon_type icon) {
-        u8g2.setFont(u8g2_font_open_iconic_embedded_2x_t);
-        u8g2.setFontDirection(0);
-        if (icon == BLE_CONNECTED) {
             u8g2.drawUTF8(55, 24, String("\u004a").c_str());
-        } else if (icon == BLE_NOT_CONNECTED) {
+        } else {
             //u8g2.drawStr(85, 15, "[ ]");
             u8g2.drawUTF8(55, 24, String("\u0047").c_str());
-        } else if (icon == SLEEPING) {
-            u8g2.drawUTF8(55, 24, String("\u004f").c_str());
         }
         u8g2.sendBuffer();
     }
 
     void updateScreen(String message) {
+        if (!started) return;
         u8g2.setFont(u8g2_font_helvR12_tf);
         u8g2.setFontDirection(0);
         u8g2.clearBuffer();

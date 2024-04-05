@@ -1,44 +1,35 @@
 #include <Arduino.h>
-#include "DHTesp.h"
 #include <Ticker.h>
-
-#ifndef ESP32
-#pragma message(THIS EXAMPLE IS FOR ESP32 ONLY!)
-#error Select ESP32 board.
-#endif
-
-#ifndef TEMP_GPIO
-#pragma message(TEMP_GPIO MUST BE SET)
-#error Set -D TEMP_GPIO=xx pin in build_flag in platform.io
-#endif
+#include <Wire.h>
+#include "ClosedCube_SHT31D.h"
 
 struct TempReadResult {
     bool ok = false;
-    TempAndHumidity tempAndHumidity;
+    SHT31D tempAndHumidity;
 };
 
 namespace TempSensor {
-    DHTesp dht;
+    ClosedCube_SHT31D sht3xd;
 
     void setup() {
-        dht.setup(TEMP_GPIO, DHTesp::DHT22);
-        Serial.print(String("Temp sensor started\n"));
+        sht3xd.begin(0x44); // I2C address: 0x44 or 0x45
+        Serial.println(String("Temp sensor started"));
     }
 
     TempReadResult readTemperatureAndHumidity() {
         TempReadResult result;
         result.ok = false;
-        auto tempHumid = dht.getTempAndHumidity();
-        if (dht.getStatusString() == "OK") {
+        SHT31D tempHumid = sht3xd.readTempAndHumidity(SHT3XD_REPEATABILITY_MEDIUM, SHT3XD_MODE_POLLING, 50);
+        if (tempHumid.error == SHT3XD_NO_ERROR) {
             result.ok = true;
             result.tempAndHumidity = tempHumid;
             Serial.print("\t");
-            Serial.print(tempHumid.humidity, 1);
+            Serial.print(tempHumid.rh, 1);
             Serial.print(" %hum\t");
-            Serial.print(tempHumid.temperature, 1);
+            Serial.print(tempHumid.t, 1);
             Serial.print(" °C \n");
         } else {
-            Serial.println(String("Failed to read temp sensor ") + String(dht.getStatusString()));
+            Serial.println(String("Failed to read temp sensor ") + String(tempHumid.error));
         }
         return result;
     }
